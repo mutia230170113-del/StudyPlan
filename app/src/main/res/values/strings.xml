@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">StudyPlan</string>
+
+    <!-- Login -->
+    <string name="login_title">Masuk ke StudyPlan</string>
+    <string name="login_subtitle">Kelola tugas kuliah dan deadline dengan mudah</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="btn_login">Masuk</string>
+    <string name="no_account">Belum punya akun? Daftar di sini</string>
+
+    <!-- Register -->
+    <string name="register_title">Buat Akun Baru</string>
+    <string name="register_subtitle">Mulai atur jadwal tugas kuliahmu sekarang</string>
+    <string name="hint_name">Nama Lengkap</string>
+    <string name="hint_confirm_password">Konfirmasi Password</string>
+    <string name="btn_register">Daftar</string>
+    <string name="have_account">Sudah punya akun? Masuk di sini</string>
+
+    <!-- Beranda -->
+    <string name="welcome_user">Halo, %1$s!</string>
+    <string name="home_subtitle">Selamat datang di StudyPlan. Fitur daftar tugas akan ditambahkan pada Commit 2.</string>
+    <string name="btn_logout">Keluar (Logout)</string>
+</resources>
