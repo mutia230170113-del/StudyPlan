@@ -19,17 +19,33 @@
 
     <!-- Beranda & Tugas -->
     <string name="welcome_user">Halo, %1$s!</string>
-    <string name="btn_logout">Keluar</string>
+    <string name="btn_logout">Keluar (Logout)</string>
     <string name="empty_task">Belum ada tugas.\nTekan tombol + untuk menambah tugas baru.</string>
+    <string name="not_found_task">Tugas tidak ditemukan.</string>
     <string name="title_add_task">Tambah Tugas</string>
     <string name="title_edit_task">Edit Tugas</string>
+    <string name="title_detail_task">Detail Tugas</string>
     <string name="hint_task_title">Judul Tugas</string>
     <string name="hint_course">Mata Kuliah</string>
     <string name="hint_description">Deskripsi Tugas</string>
     <string name="hint_deadline">Deadline (Klik untuk pilih tanggal)</string>
+    <string name="hint_search">Cari judul tugas atau mata kuliah...</string>
     <string name="label_priority">Prioritas</string>
     <string name="label_status">Status</string>
     <string name="btn_save_task">Simpan Tugas</string>
     <string name="btn_edit">Edit</string>
     <string name="btn_delete">Hapus</string>
+    <string name="btn_back">Kembali</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">Beranda</string>
+    <string name="nav_tasks">Tugas</string>
+    <string name="nav_profile">Profil</string>
+
+    <!-- Dashboard & Profil -->
+    <string name="dashboard_subtitle">Ringkasan tugas kuliah kamu saat ini</string>
+    <string name="label_total_tasks">Total Tugas</string>
+    <string name="label_pending_tasks">Belum Selesai</string>
+    <string name="label_done_tasks">Selesai</string>
+    <string name="profile_title">Profil Mahasiswa</string>
 </resources>

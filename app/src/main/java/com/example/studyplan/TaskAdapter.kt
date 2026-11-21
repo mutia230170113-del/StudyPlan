@@ -7,6 +7,7 @@ import com.example.studyplan.databinding.ItemTaskBinding
 
 class TaskAdapter(
     private var taskList: List<Task>,
+    private val onItemClick: (Task) -> Unit,
     private val onEditClick: (Task) -> Unit,
     private val onDeleteClick: (Task) -> Unit
 ) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
@@ -28,6 +29,7 @@ class TaskAdapter(
             tvTaskPriority.text = "Prioritas: ${task.priority}"
             tvTaskStatus.text = "Status: ${task.status}"
 
+            root.setOnClickListener { onItemClick(task) }
             btnEdit.setOnClickListener { onEditClick(task) }
             btnDelete.setOnClickListener { onDeleteClick(task) }
         }
