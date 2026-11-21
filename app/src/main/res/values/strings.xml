@@ -17,8 +17,19 @@
     <string name="btn_register">Daftar</string>
     <string name="have_account">Sudah punya akun? Masuk di sini</string>
 
-    <!-- Beranda -->
+    <!-- Beranda & Tugas -->
     <string name="welcome_user">Halo, %1$s!</string>
-    <string name="home_subtitle">Selamat datang di StudyPlan. Fitur daftar tugas akan ditambahkan pada Commit 2.</string>
-    <string name="btn_logout">Keluar (Logout)</string>
+    <string name="btn_logout">Keluar</string>
+    <string name="empty_task">Belum ada tugas.\nTekan tombol + untuk menambah tugas baru.</string>
+    <string name="title_add_task">Tambah Tugas</string>
+    <string name="title_edit_task">Edit Tugas</string>
+    <string name="hint_task_title">Judul Tugas</string>
+    <string name="hint_course">Mata Kuliah</string>
+    <string name="hint_description">Deskripsi Tugas</string>
+    <string name="hint_deadline">Deadline (Klik untuk pilih tanggal)</string>
+    <string name="label_priority">Prioritas</string>
+    <string name="label_status">Status</string>
+    <string name="btn_save_task">Simpan Tugas</string>
+    <string name="btn_edit">Edit</string>
+    <string name="btn_delete">Hapus</string>
 </resources>
