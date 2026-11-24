@@ -1,5 +1,7 @@
 package com.example.studyplan
 
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -26,8 +28,26 @@ class TaskAdapter(
             tvTaskTitle.text = task.title
             tvTaskCourse.text = "Mata Kuliah: ${task.course}"
             tvTaskDeadline.text = "Deadline: ${task.deadline}"
-            tvTaskPriority.text = "Prioritas: ${task.priority}"
-            tvTaskStatus.text = "Status: ${task.status}"
+            tvTaskPriority.text = task.priority
+            tvTaskStatus.text = task.status
+
+            // Warna Garis Aksen Kiri & Badge Prioritas
+            val priorityColor = when (task.priority) {
+                "Tinggi" -> "#D32F2F"
+                "Sedang" -> "#F57C00"
+                else -> "#388E3C"
+            }
+            val parsedPriorityColor = Color.parseColor(priorityColor)
+            viewPriorityStrip.setBackgroundColor(parsedPriorityColor)
+            tvTaskPriority.backgroundTintList = ColorStateList.valueOf(parsedPriorityColor)
+
+            // Warna Badge Status
+            val statusColor = when (task.status) {
+                "Selesai" -> "#2E7D32"
+                "Sedang Dikerjakan" -> "#1565C0"
+                else -> "#64748B"
+            }
+            tvTaskStatus.backgroundTintList = ColorStateList.valueOf(Color.parseColor(statusColor))
 
             root.setOnClickListener { onItemClick(task) }
             btnEdit.setOnClickListener { onEditClick(task) }

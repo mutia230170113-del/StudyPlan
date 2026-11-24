@@ -21,6 +21,12 @@ class AddEditTaskActivity : AppCompatActivity() {
 
     private val priorities = arrayOf("Rendah", "Sedang", "Tinggi")
     private val statuses = arrayOf("Belum Dikerjakan", "Sedang Dikerjakan", "Selesai")
+    private val reminders = arrayOf(
+        "Tanpa Pengingat",
+        "1 Hari Sebelum (08:00)",
+        "Hari H (08:00)",
+        "Tes 10 Detik (Demo)"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +39,6 @@ class AddEditTaskActivity : AppCompatActivity() {
         setupSpinners()
         setupDatePicker()
 
-        // Cek apakah ini mode Edit (membawa data tugas)
         @Suppress("DEPRECATION")
         existingTask = intent.getSerializableExtra("EXTRA_TASK") as? Task
 
@@ -57,11 +62,12 @@ class AddEditTaskActivity : AppCompatActivity() {
     }
 
     private fun setupSpinners() {
-        val priorityAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, priorities)
-        binding.spinnerPriority.adapter = priorityAdapter
-
-        val statusAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, statuses)
-        binding.spinnerStatus.adapter = statusAdapter
+        binding.spinnerPriority.adapter =
+            ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, priorities)
+        binding.spinnerStatus.adapter =
+            ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, statuses)
+        binding.spinnerReminder.adapter =
+            ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, reminders)
     }
 
     private fun setupDatePicker() {
@@ -91,6 +97,7 @@ class AddEditTaskActivity : AppCompatActivity() {
         val deadline = binding.etDeadline.text.toString().trim()
         val priority = binding.spinnerPriority.selectedItem.toString()
         val status = binding.spinnerStatus.selectedItem.toString()
+        val reminderOption = binding.spinnerReminder.selectedItem.toString()
 
         binding.tilTitle.error = null
         binding.tilCourse.error = null
@@ -113,7 +120,6 @@ class AddEditTaskActivity : AppCompatActivity() {
         setLoading(true)
 
         if (existingTask == null) {
-            // Mode CREATE (Tambah Baru)
             val docRef = db.collection("tasks").document()
             val newTask = Task(
                 id = docRef.id,
@@ -128,6 +134,7 @@ class AddEditTaskActivity : AppCompatActivity() {
             docRef.set(newTask)
                 .addOnSuccessListener {
                     setLoading(false)
+                    NotificationHelper.scheduleReminder(this, newTask, reminderOption)
                     Toast.makeText(this, "Tugas berhasil ditambahkan!", Toast.LENGTH_SHORT).show()
                     finish()
                 }
@@ -136,7 +143,6 @@ class AddEditTaskActivity : AppCompatActivity() {
                     Toast.makeText(this, "Gagal menyimpan: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
                 }
         } else {
-            // Mode UPDATE (Edit)
             val updatedTask = Task(
                 id = existingTask!!.id,
                 userId = userId,
@@ -150,6 +156,7 @@ class AddEditTaskActivity : AppCompatActivity() {
             db.collection("tasks").document(existingTask!!.id).set(updatedTask)
                 .addOnSuccessListener {
                     setLoading(false)
+                    NotificationHelper.scheduleReminder(this, updatedTask, reminderOption)
                     Toast.makeText(this, "Tugas berhasil diperbarui!", Toast.LENGTH_SHORT).show()
                     finish()
                 }
