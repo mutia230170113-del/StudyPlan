@@ -1,23 +1,35 @@
 package com.example.studyplan
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Base64
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.canhub.cropper.CropImageContract
+import com.canhub.cropper.CropImageContractOptions
+import com.canhub.cropper.CropImageOptions
+import com.canhub.cropper.CropImageView
 import com.example.studyplan.databinding.ActivityMainBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
+import java.io.ByteArrayOutputStream
 
 class MainActivity : AppCompatActivity() {
 
@@ -38,7 +50,24 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    // Pemilih + Crop Foto Interaktif (Bisa Geser & Zoom Lingkaran)
+    private val cropImageLauncher =
+        registerForActivityResult(CropImageContract()) { result ->
+            if (result.isSuccessful) {
+                val croppedUri = result.uriContent
+                if (croppedUri != null) {
+                    saveProfilePhotoToFirestore(croppedUri)
+                }
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        val prefs = getSharedPreferences("studyplan_prefs", Context.MODE_PRIVATE)
+        val isDarkMode = prefs.getBoolean("is_dark_mode", false)
+        AppCompatDelegate.setDefaultNightMode(
+            if (isDarkMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+        )
+
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -53,13 +82,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         updateUserProfileUI(currentUser.displayName ?: "Mahasiswa", currentUser.email ?: "")
+        loadProfilePhoto()
 
         setupRecyclerViews()
         setupSearchAndFilter()
         setupBottomNavigation()
-        setupProfileMenu()
+        setupProfileMenu(isDarkMode)
         askNotificationPermission()
 
+        binding.swipeRefreshTasks.setOnRefreshListener { loadTasks() }
         binding.btnRetry.setOnClickListener { loadTasks() }
 
         binding.btnLogout.setOnClickListener {
@@ -93,8 +124,83 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupProfileMenu() {
-        // 1. Edit Nama Profil
+    private fun saveProfilePhotoToFirestore(uri: Uri) {
+        val userId = auth.currentUser?.uid ?: return
+        try {
+            val inputStream = contentResolver.openInputStream(uri)
+            val originalBitmap = BitmapFactory.decodeStream(inputStream)
+            inputStream?.close()
+
+            if (originalBitmap != null) {
+                val size = minOf(originalBitmap.width, originalBitmap.height)
+                val xOffset = (originalBitmap.width - size) / 2
+                val yOffset = (originalBitmap.height - size) / 2
+                val squareBitmap = Bitmap.createBitmap(originalBitmap, xOffset, yOffset, size, size)
+
+                val resizedBitmap = Bitmap.createScaledBitmap(squareBitmap, 300, 300, true)
+                val outputStream = ByteArrayOutputStream()
+                resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
+                val base64Photo = Base64.encodeToString(outputStream.toByteArray(), Base64.DEFAULT)
+
+                db.collection("users").document(userId)
+                    .set(mapOf("photoBase64" to base64Photo), SetOptions.merge())
+                    .addOnSuccessListener {
+                        binding.ivProfilePhoto.setImageBitmap(resizedBitmap)
+                        binding.ivProfilePhoto.visibility = View.VISIBLE
+                        binding.tvProfileInitials.visibility = View.GONE
+                        Toast.makeText(this, "Foto profil berhasil disimpan!", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Gagal menyimpan foto: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                    }
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, "Gagal memproses foto", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun loadProfilePhoto() {
+        val userId = auth.currentUser?.uid ?: return
+        db.collection("users").document(userId).get()
+            .addOnSuccessListener { doc ->
+                val base64Photo = doc.getString("photoBase64")
+                if (!base64Photo.isNullOrEmpty()) {
+                    try {
+                        val bytes = Base64.decode(base64Photo, Base64.DEFAULT)
+                        val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                        binding.ivProfilePhoto.setImageBitmap(bitmap)
+                        binding.ivProfilePhoto.visibility = View.VISIBLE
+                        binding.tvProfileInitials.visibility = View.GONE
+                    } catch (_: Exception) {
+                        binding.ivProfilePhoto.visibility = View.GONE
+                        binding.tvProfileInitials.visibility = View.VISIBLE
+                    }
+                } else {
+                    binding.ivProfilePhoto.visibility = View.GONE
+                    binding.tvProfileInitials.visibility = View.VISIBLE
+                }
+            }
+    }
+
+    private fun setupProfileMenu(isDarkMode: Boolean) {
+        // 1. Ganti & Crop Foto Profil
+        binding.cardAvatar.setOnClickListener {
+            cropImageLauncher.launch(
+                CropImageContractOptions(
+                    uri = null,
+                    cropImageOptions = CropImageOptions(
+                        imageSourceIncludeGallery = true,
+                        imageSourceIncludeCamera = false,
+                        aspectRatioX = 1,
+                        aspectRatioY = 1,
+                        fixAspectRatio = true,
+                        cropShape = CropImageView.CropShape.OVAL
+                    )
+                )
+            )
+        }
+
+        // 2. Edit Nama Profil
         binding.menuEditName.setOnClickListener {
             val input = EditText(this).apply {
                 setText(auth.currentUser?.displayName ?: "")
@@ -120,7 +226,17 @@ class MainActivity : AppCompatActivity() {
                 .show()
         }
 
-        // 2. Toggle Notifikasi
+        // 3. Saklar Mode Gelap
+        binding.switchDarkMode.isChecked = isDarkMode
+        binding.switchDarkMode.setOnCheckedChangeListener { _, checked ->
+            val prefs = getSharedPreferences("studyplan_prefs", Context.MODE_PRIVATE)
+            prefs.edit().putBoolean("is_dark_mode", checked).apply()
+            AppCompatDelegate.setDefaultNightMode(
+                if (checked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+            )
+        }
+
+        // 4. Toggle Notifikasi
         binding.switchNotifications.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 askNotificationPermission()
@@ -130,11 +246,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // 3. Tentang Aplikasi
+        // 5. Tentang Aplikasi
         binding.menuAboutApp.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle("Tentang StudyPlan")
-                .setMessage("StudyPlan v1.0\n\nAplikasi manajemen tugas kuliah berbasis Android dengan Firebase Authentication, Cloud Firestore, dan Pengingat Deadline.")
+                .setMessage("StudyPlan v1.0\n\nAplikasi manajemen tugas kuliah berbasis Android dengan Firebase Authentication, Cloud Firestore, Pengingat Deadline, dan Tema Terang/Gelap.")
                 .setPositiveButton("Tutup", null)
                 .show()
         }
@@ -230,6 +346,7 @@ class MainActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener { documents ->
                 binding.progressBar.visibility = View.GONE
+                binding.swipeRefreshTasks.isRefreshing = false
                 allTasks.clear()
                 for (doc in documents) {
                     val task = doc.toObject(Task::class.java)
@@ -240,6 +357,7 @@ class MainActivity : AppCompatActivity() {
             }
             .addOnFailureListener { e ->
                 binding.progressBar.visibility = View.GONE
+                binding.swipeRefreshTasks.isRefreshing = false
                 binding.layoutErrorState.visibility = View.VISIBLE
                 Toast.makeText(this, "Gagal memuat tugas: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
             }
@@ -255,13 +373,11 @@ class MainActivity : AppCompatActivity() {
         binding.tvDoneTasks.text = done.toString()
         binding.tvPendingTasks.text = pending.toString()
 
-        // Update Progress Bar Beranda & Produktivitas Profil
         binding.tvProgressPercent.text = "$progressPercent%"
         binding.progressBarTasks.progress = progressPercent
         binding.tvProfileDoneCount.text = done.toString()
         binding.tvProfileProgressPercent.text = "$progressPercent%"
 
-        // Tampilkan maks 3 tugas belum selesai di Beranda
         val upcoming = allTasks.filter { it.status != "Selesai" }.take(3)
         upcomingAdapter.updateData(upcoming)
         binding.tvUpcomingEmpty.visibility = if (upcoming.isEmpty()) View.VISIBLE else View.GONE

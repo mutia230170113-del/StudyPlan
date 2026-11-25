@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@color/bg_light">
 
-    <!-- 1. LAYAR BERANDA (DASHBOARD UPGRADE) -->
+    <!-- 1. LAYAR BERANDA -->
     <ScrollView
         android:id="@+id/sectionDashboard"
         android:layout_width="0dp"
@@ -22,11 +22,11 @@
             android:orientation="vertical"
             android:paddingBottom="88dp">
 
-            <!-- Header Biru Gradasi Melengkung + Progress Bar -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_header_curved"
+                android:elevation="6dp"
                 android:orientation="vertical"
                 android:paddingHorizontal="20dp"
                 android:paddingTop="28dp"
@@ -45,10 +45,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:text="Semangat selesaikan target kuliahmu hari ini"
-                    android:textColor="#DBEAFE"
+                    android:textColor="#E0ECFF"
                     android:textSize="13sp" />
 
-                <!-- Kartu Progres Transparan -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -94,34 +93,37 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Konten Dashboard -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- 3 Kartu Statistik Sejajar -->
+                <!-- 3 Kartu Statistik Efek 3D -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    android:paddingVertical="4dp">
 
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="6dp"
                         android:layout_weight="1"
-                        app:cardBackgroundColor="@color/white"
-                        app:cardCornerRadius="14dp"
-                        app:cardElevation="2dp">
+                        app:cardBackgroundColor="@color/card_bg"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="6dp"
+                        app:strokeColor="@color/card_stroke"
+                        app:strokeWidth="1dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:orientation="vertical"
-                            android:padding="12dp">
+                            android:padding="14dp">
 
                             <TextView
                                 android:id="@+id/tvTotalTasks"
@@ -148,23 +150,25 @@
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="3dp"
                         android:layout_weight="1"
-                        app:cardBackgroundColor="@color/white"
-                        app:cardCornerRadius="14dp"
-                        app:cardElevation="2dp">
+                        app:cardBackgroundColor="@color/card_bg"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="6dp"
+                        app:strokeColor="@color/card_stroke"
+                        app:strokeWidth="1dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:orientation="vertical"
-                            android:padding="12dp">
+                            android:padding="14dp">
 
                             <TextView
                                 android:id="@+id/tvPendingTasks"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0"
-                                android:textColor="#D32F2F"
+                                android:textColor="#E55353"
                                 android:textSize="24sp"
                                 android:textStyle="bold" />
 
@@ -184,23 +188,25 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
                         android:layout_weight="1"
-                        app:cardBackgroundColor="@color/white"
-                        app:cardCornerRadius="14dp"
-                        app:cardElevation="2dp">
+                        app:cardBackgroundColor="@color/card_bg"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="6dp"
+                        app:strokeColor="@color/card_stroke"
+                        app:strokeWidth="1dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:orientation="vertical"
-                            android:padding="12dp">
+                            android:padding="14dp">
 
                             <TextView
                                 android:id="@+id/tvDoneTasks"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0"
-                                android:textColor="#2E7D32"
+                                android:textColor="#38A169"
                                 android:textSize="24sp"
                                 android:textStyle="bold" />
 
@@ -216,7 +222,6 @@
                     </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
 
-                <!-- Bagian Deadline Terdekat -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -246,7 +251,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- 2. LAYAR DAFTAR TUGAS (HEADER BIRU + FILTER CHIPS) -->
+    <!-- 2. LAYAR DAFTAR TUGAS -->
     <LinearLayout
         android:id="@+id/sectionTasks"
         android:layout_width="0dp"
@@ -261,7 +266,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/primary_blue"
+            android:background="@drawable/bg_header_curved"
+            android:elevation="6dp"
             android:orientation="vertical"
             android:paddingHorizontal="20dp"
             android:paddingVertical="18dp">
@@ -287,10 +293,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                app:cardBackgroundColor="@color/white"
+                app:cardBackgroundColor="@color/card_bg"
                 app:cardCornerRadius="24dp"
-                app:cardElevation="1dp"
-                app:strokeColor="#CBD5E1"
+                app:cardElevation="4dp"
+                app:strokeColor="@color/card_stroke"
                 app:strokeWidth="1dp">
 
                 <androidx.appcompat.widget.SearchView
@@ -302,7 +308,6 @@
                     app:queryHint="Cari judul tugas atau mata kuliah..." />
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Filter Chips Horizontal -->
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -355,7 +360,6 @@
                 android:layout_marginTop="24dp"
                 android:visibility="gone" />
 
-            <!-- Error State -->
             <LinearLayout
                 android:id="@+id/layoutErrorState"
                 android:layout_width="match_parent"
@@ -370,7 +374,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="Gagal memuat data tugas.\nPeriksa koneksi internet kamu."
-                    android:textColor="#D32F2F"
+                    android:textColor="#E55353"
                     android:textSize="14sp" />
 
                 <com.google.android.material.button.MaterialButton
@@ -392,17 +396,23 @@
                 android:textSize="15sp"
                 android:visibility="gone" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvTasks"
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swipeRefreshTasks"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
-                android:clipToPadding="false"
-                android:paddingBottom="80dp" />
+                android:layout_weight="1">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvTasks"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:paddingBottom="80dp" />
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
         </LinearLayout>
     </LinearLayout>
 
-    <!-- 3. LAYAR PROFIL (RINGKASAN PRODUKTIVITAS + PENGATURAN) -->
+    <!-- 3. LAYAR PROFIL (FOTO PROFIL + DARK MODE + PENGATURAN) -->
     <ScrollView
         android:id="@+id/sectionProfile"
         android:layout_width="0dp"
@@ -420,11 +430,11 @@
             android:orientation="vertical"
             android:paddingBottom="32dp">
 
-            <!-- Header Melengkung -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="110dp"
                 android:background="@drawable/bg_header_curved"
+                android:elevation="6dp"
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
                 android:paddingTop="24dp">
@@ -438,25 +448,55 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Avatar Tumpang Tindih -->
+            <!-- Avatar Foto / Inisial (Ketuk untuk Ganti Foto) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardAvatar"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:layout_marginTop="-48dp"
+                app:cardBackgroundColor="@color/primary_blue"
+                app:cardCornerRadius="48dp"
+                app:cardElevation="8dp"
+                app:strokeColor="@color/card_bg"
+                app:strokeWidth="4dp">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:id="@+id/tvProfileInitials"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="M"
+                        android:textColor="@color/white"
+                        android:textSize="32sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:id="@+id/ivProfilePhoto"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="Foto Profil"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone" />
+                </FrameLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <TextView
-                android:id="@+id/tvProfileInitials"
-                android:layout_width="88dp"
-                android:layout_height="88dp"
-                android:layout_marginTop="-44dp"
-                android:background="@drawable/bg_circle_avatar"
-                android:elevation="4dp"
-                android:gravity="center"
-                android:text="M"
-                android:textColor="@color/white"
-                android:textSize="32sp"
-                android:textStyle="bold" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Ketuk foto untuk mengubah"
+                android:textColor="@color/primary_blue"
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/tvProfileName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="8dp"
                 android:textColor="@color/text_primary"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -469,15 +509,17 @@
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp" />
 
-            <!-- Kartu Ringkasan Produktivitas -->
+            <!-- Kartu Ringkasan Produktivitas 3D -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="20dp"
-                app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp">
+                app:cardBackgroundColor="@color/card_bg"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="6dp"
+                app:strokeColor="@color/card_stroke"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -526,7 +568,7 @@
                         <View
                             android:layout_width="1dp"
                             android:layout_height="match_parent"
-                            android:background="#E2E8F0" />
+                            android:background="@color/divider_color" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -540,7 +582,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0%"
-                                android:textColor="#2E7D32"
+                                android:textColor="#38A169"
                                 android:textSize="22sp"
                                 android:textStyle="bold" />
 
@@ -555,15 +597,17 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Kartu Pengaturan -->
+            <!-- Kartu Pengaturan 3D -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="14dp"
-                app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp">
+                app:cardBackgroundColor="@color/card_bg"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="6dp"
+                app:strokeColor="@color/card_stroke"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -593,7 +637,32 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="#F1F5F9" />
+                        android:background="@color/divider_color" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="🌙  Mode Gelap (Dark Mode)"
+                            android:textColor="@color/text_primary"
+                            android:textSize="14sp" />
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/switchDarkMode"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/divider_color" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -619,7 +688,7 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="#F1F5F9" />
+                        android:background="@color/divider_color" />
 
                     <TextView
                         android:id="@+id/menuAboutApp"
@@ -633,7 +702,6 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Tombol Logout -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLogout"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -642,13 +710,12 @@
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="20dp"
                 android:text="Keluar (Logout)"
-                android:textColor="#D32F2F"
+                android:textColor="#E55353"
                 app:cornerRadius="26dp"
-                app:strokeColor="#D32F2F" />
+                app:strokeColor="#E55353" />
         </LinearLayout>
     </ScrollView>
 
-    <!-- TOMBOL TAMBAH TUGAS -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddTask"
         android:layout_width="wrap_content"
@@ -656,17 +723,18 @@
         android:layout_margin="20dp"
         android:contentDescription="Tambah Tugas"
         app:backgroundTint="@color/primary_blue"
+        app:elevation="8dp"
         app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@android:drawable/ic_input_add"
         app:tint="@color/white" />
 
-    <!-- BOTTOM NAVIGATION -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/card_bg"
+        app:elevation="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

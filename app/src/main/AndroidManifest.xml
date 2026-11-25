@@ -16,14 +16,18 @@
         android:theme="@style/Theme.StudyPlan">
 
         <activity
-            android:name=".LoginActivity"
-            android:exported="true"
-            android:windowSoftInputMode="adjustResize">
+            android:name=".SplashActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".RegisterActivity"
@@ -43,6 +47,10 @@
         <activity
             android:name=".TaskDetailActivity"
             android:exported="false" />
+
+        <activity
+            android:name="com.canhub.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat" />
 
         <receiver
             android:name=".ReminderReceiver"

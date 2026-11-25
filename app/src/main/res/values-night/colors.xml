@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Palet Biru Soft (Mode Gelap) -->
+    <color name="primary_blue">#6C9DF0</color>
+    <color name="primary_dark">#0F172A</color>
+    <color name="header_start">#1E293B</color>
+    <color name="header_end">#283B5B</color>
+
+    <color name="bg_light">#0F172A</color>
+    <color name="card_bg">#1E293B</color>
+    <color name="card_stroke">#334155</color>
+    <color name="divider_color">#334155</color>
+
+    <color name="text_primary">#F1F5F9</color>
+    <color name="text_secondary">#94A3B8</color>
+</resources>

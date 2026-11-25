@@ -3,11 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
-    app:cardBackgroundColor="@color/white"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="2dp"
-    app:strokeColor="#E2E8F0"
+    android:layout_marginHorizontal="2dp"
+    android:layout_marginBottom="14dp"
+    app:cardBackgroundColor="@color/card_bg"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="6dp"
+    app:strokeColor="@color/card_stroke"
     app:strokeWidth="1dp">
 
     <LinearLayout
@@ -15,12 +16,11 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <!-- Garis Aksen Warna Prioritas di Sisi Kiri -->
         <View
             android:id="@+id/viewPriorityStrip"
             android:layout_width="6dp"
             android:layout_height="match_parent"
-            android:background="#1565C0" />
+            android:background="@color/primary_blue" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -45,16 +45,35 @@
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp" />
 
-            <TextView
-                android:id="@+id/tvTaskDeadline"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textColor="@color/primary_blue"
-                android:textSize="13sp"
-                android:textStyle="bold" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-            <!-- Badge Prioritas & Status -->
+                <TextView
+                    android:id="@+id/tvTaskDeadline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/primary_blue"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvDeadlineCountdown"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_badge"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp"
+                    android:textColor="@color/white"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+            </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -89,7 +108,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="10dp"
-                android:background="#F1F5F9" />
+                android:background="@color/divider_color" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -119,10 +138,9 @@
                     android:insetBottom="0dp"
                     android:text="Hapus"
                     android:textAllCaps="false"
-                    android:textColor="#D32F2F"
+                    android:textColor="#E55353"
                     android:textSize="13sp" />
             </LinearLayout>
-
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
