@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.util.Base64
 import android.view.View
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -30,6 +31,9 @@ import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import java.io.ByteArrayOutputStream
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
@@ -42,6 +46,8 @@ class MainActivity : AppCompatActivity() {
     private val allTasks = mutableListOf<Task>()
     private var currentSearchQuery = ""
     private var currentFilterStatus = "Semua Status"
+    private var currentTabId: Int = R.id.nav_home
+    private var currentProfileBitmap: Bitmap? = null
 
     private val requestNotificationPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -50,7 +56,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-    // Pemilih + Crop Foto Interaktif (Bisa Geser & Zoom Lingkaran)
     private val cropImageLauncher =
         registerForActivityResult(CropImageContract()) { result ->
             if (result.isSuccessful) {
@@ -101,6 +106,16 @@ class MainActivity : AppCompatActivity() {
         binding.fabAddTask.setOnClickListener {
             startActivity(Intent(this, AddEditTaskActivity::class.java))
         }
+
+        // Pertahankan posisi tab terakhir saat ganti Tema Gelap/Terang
+        currentTabId = savedInstanceState?.getInt("CURRENT_TAB_ID", R.id.nav_home) ?: R.id.nav_home
+        binding.bottomNavigation.selectedItemId = currentTabId
+        showTab(currentTabId)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("CURRENT_TAB_ID", currentTabId)
     }
 
     override fun onResume() {
@@ -145,6 +160,7 @@ class MainActivity : AppCompatActivity() {
                 db.collection("users").document(userId)
                     .set(mapOf("photoBase64" to base64Photo), SetOptions.merge())
                     .addOnSuccessListener {
+                        currentProfileBitmap = resizedBitmap
                         binding.ivProfilePhoto.setImageBitmap(resizedBitmap)
                         binding.ivProfilePhoto.visibility = View.VISIBLE
                         binding.tvProfileInitials.visibility = View.GONE
@@ -168,14 +184,17 @@ class MainActivity : AppCompatActivity() {
                     try {
                         val bytes = Base64.decode(base64Photo, Base64.DEFAULT)
                         val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                        currentProfileBitmap = bitmap
                         binding.ivProfilePhoto.setImageBitmap(bitmap)
                         binding.ivProfilePhoto.visibility = View.VISIBLE
                         binding.tvProfileInitials.visibility = View.GONE
                     } catch (_: Exception) {
+                        currentProfileBitmap = null
                         binding.ivProfilePhoto.visibility = View.GONE
                         binding.tvProfileInitials.visibility = View.VISIBLE
                     }
                 } else {
+                    currentProfileBitmap = null
                     binding.ivProfilePhoto.visibility = View.GONE
                     binding.tvProfileInitials.visibility = View.VISIBLE
                 }
@@ -183,8 +202,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupProfileMenu(isDarkMode: Boolean) {
-        // 1. Ganti & Crop Foto Profil
+        // 1A. Ketuk Foto -> Lihat Foto Profil Besar
         binding.cardAvatar.setOnClickListener {
+            if (currentProfileBitmap != null) {
+                val imageView = ImageView(this).apply {
+                    setImageBitmap(currentProfileBitmap)
+                    adjustViewBounds = true
+                    setPadding(24, 24, 24, 24)
+                }
+                AlertDialog.Builder(this)
+                    .setTitle("Foto Profil")
+                    .setView(imageView)
+                    .setPositiveButton("Tutup", null)
+                    .show()
+            } else {
+                Toast.makeText(this, "Belum ada foto profil. Ketuk ikon kamera untuk mengunggah.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // 1B. Ketuk Ikon Kamera -> Ubah & Crop Foto
+        binding.btnChangePhoto.setOnClickListener {
             cropImageLauncher.launch(
                 CropImageContractOptions(
                     uri = null,
@@ -258,31 +295,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupBottomNavigation() {
         binding.bottomNavigation.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_home -> {
-                    binding.sectionDashboard.visibility = View.VISIBLE
-                    binding.sectionTasks.visibility = View.GONE
-                    binding.sectionProfile.visibility = View.GONE
-                    binding.fabAddTask.visibility = View.VISIBLE
-                    true
-                }
-                R.id.nav_tasks -> {
-                    binding.sectionDashboard.visibility = View.GONE
-                    binding.sectionTasks.visibility = View.VISIBLE
-                    binding.sectionProfile.visibility = View.GONE
-                    binding.fabAddTask.visibility = View.VISIBLE
-                    true
-                }
-                R.id.nav_profile -> {
-                    binding.sectionDashboard.visibility = View.GONE
-                    binding.sectionTasks.visibility = View.GONE
-                    binding.sectionProfile.visibility = View.VISIBLE
-                    binding.fabAddTask.visibility = View.GONE
-                    true
-                }
-                else -> false
-            }
+            currentTabId = item.itemId
+            showTab(currentTabId)
+            true
         }
+    }
+
+    private fun showTab(tabId: Int) {
+        binding.sectionDashboard.visibility = if (tabId == R.id.nav_home) View.VISIBLE else View.GONE
+        binding.sectionTasks.visibility = if (tabId == R.id.nav_tasks) View.VISIBLE else View.GONE
+        binding.sectionProfile.visibility = if (tabId == R.id.nav_profile) View.VISIBLE else View.GONE
+        binding.fabAddTask.visibility = if (tabId == R.id.nav_profile) View.GONE else View.VISIBLE
     }
 
     private fun setupRecyclerViews() {
@@ -352,6 +375,35 @@ class MainActivity : AppCompatActivity() {
                     val task = doc.toObject(Task::class.java)
                     allTasks.add(task)
                 }
+
+                // Urutkan pintar: Aktif (terdekat) -> Terlewat -> Selesai
+                val sdf = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+                val todayMillis = Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }.timeInMillis
+
+                allTasks.sortWith(compareBy<Task> { task ->
+                    val deadlineMillis = try {
+                        sdf.parse(task.deadline)?.time ?: Long.MAX_VALUE
+                    } catch (e: Exception) {
+                        Long.MAX_VALUE
+                    }
+                    when {
+                        task.status == "Selesai" -> 2
+                        deadlineMillis < todayMillis -> 1
+                        else -> 0
+                    }
+                }.thenBy { task ->
+                    try {
+                        sdf.parse(task.deadline)?.time ?: Long.MAX_VALUE
+                    } catch (e: Exception) {
+                        Long.MAX_VALUE
+                    }
+                })
+
                 updateDashboardStats()
                 applySearchAndFilter()
             }
@@ -377,6 +429,7 @@ class MainActivity : AppCompatActivity() {
         binding.progressBarTasks.progress = progressPercent
         binding.tvProfileDoneCount.text = done.toString()
         binding.tvProfileProgressPercent.text = "$progressPercent%"
+        binding.progressBarProfile.progress = progressPercent
 
         val upcoming = allTasks.filter { it.status != "Selesai" }.take(3)
         upcomingAdapter.updateData(upcoming)

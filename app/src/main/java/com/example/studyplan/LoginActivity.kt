@@ -8,6 +8,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.studyplan.databinding.ActivityLoginBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 
 class LoginActivity : AppCompatActivity() {
 
@@ -68,8 +70,24 @@ class LoginActivity : AppCompatActivity() {
                     Toast.makeText(this, "Login berhasil!", Toast.LENGTH_SHORT).show()
                     goToMain()
                 } else {
-                    val errorMsg = task.exception?.localizedMessage ?: "Login gagal, periksa email dan password."
-                    Toast.makeText(this, errorMsg, Toast.LENGTH_LONG).show()
+                    when (task.exception) {
+                        is FirebaseAuthInvalidUserException,
+                        is FirebaseAuthInvalidCredentialsException -> {
+                            Toast.makeText(
+                                this,
+                                "Akun belum terdaftar atau password salah.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            startActivity(Intent(this, RegisterActivity::class.java))
+                        }
+                        else -> {
+                            Toast.makeText(
+                                this,
+                                "Gagal login. Periksa koneksi internet.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
                 }
             }
     }

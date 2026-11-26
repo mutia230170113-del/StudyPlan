@@ -3,12 +3,13 @@ package com.example.studyplan
 import java.io.Serializable
 
 data class Task(
-    var id: String = "",
-    var userId: String = "",
-    var title: String = "",
-    var course: String = "",
-    var description: String = "",
-    var deadline: String = "",
-    var priority: String = "Sedang",
-    var status: String = "Belum Dikerjakan"
+    val id: String = "",
+    val userId: String = "",
+    val title: String = "",
+    val course: String = "",
+    val description: String = "",
+    val deadline: String = "",
+    val priority: String = "Sedang",
+    val status: String = "Belum Dikerjakan",
+    val reminder: String = "Tanpa Pengingat"
 ) : Serializable

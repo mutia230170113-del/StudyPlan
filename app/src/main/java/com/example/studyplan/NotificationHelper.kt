@@ -11,7 +11,7 @@ import java.util.Locale
 object NotificationHelper {
 
     fun scheduleReminder(context: Context, task: Task, reminderOption: String) {
-        if (reminderOption == "Tanpa Pengingat") return
+        if (reminderOption == "Tanpa Pengingat" || reminderOption == "Atur Waktu Sendiri...") return
 
         val triggerTimeMillis = calculateTriggerTime(task.deadline, reminderOption) ?: return
 
@@ -44,6 +44,22 @@ object NotificationHelper {
     private fun calculateTriggerTime(deadlineStr: String, reminderOption: String): Long? {
         if (reminderOption == "Tes 10 Detik (Demo)") {
             return System.currentTimeMillis() + 10_000L
+        }
+
+        // Pengingat Custom (pilih tanggal & jam sendiri)
+        if (reminderOption.startsWith("Custom: ")) {
+            return try {
+                val customDateTime = reminderOption.removePrefix("Custom: ").trim()
+                val sdf = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault())
+                val date = sdf.parse(customDateTime) ?: return null
+                if (date.time <= System.currentTimeMillis()) {
+                    System.currentTimeMillis() + 10_000L
+                } else {
+                    date.time
+                }
+            } catch (e: Exception) {
+                null
+            }
         }
 
         return try {

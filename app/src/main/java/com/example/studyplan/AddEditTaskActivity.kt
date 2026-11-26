@@ -1,8 +1,10 @@
 package com.example.studyplan
 
 import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.os.Bundle
 import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -21,12 +23,20 @@ class AddEditTaskActivity : AppCompatActivity() {
 
     private val priorities = arrayOf("Rendah", "Sedang", "Tinggi")
     private val statuses = arrayOf("Belum Dikerjakan", "Sedang Dikerjakan", "Selesai")
-    private val reminders = arrayOf(
+    private val reminders = mutableListOf(
         "Tanpa Pengingat",
         "1 Hari Sebelum (08:00)",
         "Hari H (08:00)",
-        "Tes 10 Detik (Demo)"
+        "Tes 10 Detik (Demo)",
+        "Atur Waktu Sendiri..."
     )
+    private lateinit var reminderAdapter: ArrayAdapter<String>
+    private var isUserInteracting = false
+
+    override fun onUserInteraction() {
+        super.onUserInteraction()
+        isUserInteracting = true
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +64,16 @@ class AddEditTaskActivity : AppCompatActivity() {
 
             val statusIndex = statuses.indexOf(existingTask?.status)
             if (statusIndex >= 0) binding.spinnerStatus.setSelection(statusIndex)
+
+            val savedReminder = existingTask?.reminder ?: "Tanpa Pengingat"
+            if (savedReminder.startsWith("Custom: ")) {
+                reminders[4] = savedReminder
+                reminderAdapter.notifyDataSetChanged()
+                binding.spinnerReminder.setSelection(4)
+            } else {
+                val reminderIndex = reminders.indexOf(savedReminder)
+                if (reminderIndex >= 0) binding.spinnerReminder.setSelection(reminderIndex)
+            }
         }
 
         binding.btnSaveTask.setOnClickListener {
@@ -66,8 +86,48 @@ class AddEditTaskActivity : AppCompatActivity() {
             ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, priorities)
         binding.spinnerStatus.adapter =
             ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, statuses)
-        binding.spinnerReminder.adapter =
-            ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, reminders)
+
+        reminderAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, reminders)
+        binding.spinnerReminder.adapter = reminderAdapter
+
+        binding.spinnerReminder.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (!isUserInteracting) return
+                if (position == 4) {
+                    showCustomReminderPicker()
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+    }
+
+    private fun showCustomReminderPicker() {
+        val calendar = Calendar.getInstance()
+        DatePickerDialog(
+            this,
+            { _, year, month, day ->
+                TimePickerDialog(
+                    this,
+                    { _, hour, minute ->
+                        val formatted = String.format(
+                            Locale.getDefault(),
+                            "Custom: %02d-%02d-%04d %02d:%02d",
+                            day, month + 1, year, hour, minute
+                        )
+                        reminders[4] = formatted
+                        reminderAdapter.notifyDataSetChanged()
+                        binding.spinnerReminder.setSelection(4)
+                    },
+                    calendar.get(Calendar.HOUR_OF_DAY),
+                    calendar.get(Calendar.MINUTE),
+                    true
+                ).show()
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).show()
     }
 
     private fun setupDatePicker() {
@@ -97,7 +157,8 @@ class AddEditTaskActivity : AppCompatActivity() {
         val deadline = binding.etDeadline.text.toString().trim()
         val priority = binding.spinnerPriority.selectedItem.toString()
         val status = binding.spinnerStatus.selectedItem.toString()
-        val reminderOption = binding.spinnerReminder.selectedItem.toString()
+        val selectedReminder = binding.spinnerReminder.selectedItem.toString()
+        val reminderOption = if (selectedReminder == "Atur Waktu Sendiri...") "Tanpa Pengingat" else selectedReminder
 
         binding.tilTitle.error = null
         binding.tilCourse.error = null
@@ -129,7 +190,8 @@ class AddEditTaskActivity : AppCompatActivity() {
                 description = description,
                 deadline = deadline,
                 priority = priority,
-                status = status
+                status = status,
+                reminder = reminderOption
             )
             docRef.set(newTask)
                 .addOnSuccessListener {
@@ -151,7 +213,8 @@ class AddEditTaskActivity : AppCompatActivity() {
                 description = description,
                 deadline = deadline,
                 priority = priority,
-                status = status
+                status = status,
+                reminder = reminderOption
             )
             db.collection("tasks").document(existingTask!!.id).set(updatedTask)
                 .addOnSuccessListener {
